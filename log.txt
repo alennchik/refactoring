@@ -1,4 +1,6 @@
-268a7c8 (HEAD -> main, origin/main, origin/HEAD) Task 1.1
+148c6ed Task 2.1
+077b883 Task 1.2
+268a7c8 Task 1.1
 2b4f164 fixed tests for the not-for-credit tasks; parameter ordering and ensuring consistent line endings.
 ff5004e adding shortcut keys for Inline Variable (Re: Piazza question)
 b545fe2 clarifying extracted method names in README.md
