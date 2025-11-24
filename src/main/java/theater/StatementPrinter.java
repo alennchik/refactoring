@@ -23,24 +23,19 @@ public class StatementPrinter {
      * @throws RuntimeException if one of the play types is not known
      */
     public String statement() {
-        int totalAmount = 0;
-        int volumeCredits = 0;
+
+        final int totalAmount = getTotalAmount();
+        final int volumeCredits = getTotalVolumeCredits();
+
         final StringBuilder result =
                 new StringBuilder("Statement for " + invoice.getCustomer() + System.lineSeparator());
 
         for (Performance performance : invoice.getPerformances()) {
-
-            // add volume credits
-            volumeCredits += getVolumeCredits(performance);
-
-            // print line for this order
             result.append(String.format(
                     "  %s: %s (%s seats)%n",
                     getPlay(performance).getName(),
                     usd(getAmount(performance)),
                     performance.getAudience()));
-
-            totalAmount += getAmount(performance);
         }
 
         result.append(String.format(
@@ -51,23 +46,31 @@ public class StatementPrinter {
         return result.toString();
     }
 
-    /**
-     * Format an amount in cents as a US currency string.
-     *
-     * @param amountInCents the amount in cents
-     * @return formatted US currency string
-     */
+    /** Computes the total volume credits across all performances. */
+    private int getTotalVolumeCredits() {
+        int result = 0;
+        for (Performance performance : invoice.getPerformances()) {
+            result += getVolumeCredits(performance);
+        }
+        return result;
+    }
+
+    /** Computes the total amount owed across all performances. */
+    private int getTotalAmount() {
+        int result = 0;
+        for (Performance performance : invoice.getPerformances()) {
+            result += getAmount(performance);
+        }
+        return result;
+    }
+
+    /** Format an amount in cents as a US currency string. */
     private String usd(int amountInCents) {
         final NumberFormat frmt = NumberFormat.getCurrencyInstance(Locale.US);
         return frmt.format(amountInCents / Constants.PERCENT_FACTOR);
     }
 
-    /**
-     * Computes the volume credits earned for a single performance.
-     *
-     * @param performance the performance being evaluated
-     * @return volume credits earned for this performance
-     */
+    /** Computes the volume credits earned for a single performance. */
     private int getVolumeCredits(Performance performance) {
         int result = 0;
 
@@ -81,23 +84,12 @@ public class StatementPrinter {
         return result;
     }
 
-    /**
-     * Helper: return the play associated with the given performance.
-     *
-     * @param performance the performance to evaluate
-     * @return the associated Play object
-     */
+    /** Helper: return the play associated with the given performance. */
     private Play getPlay(Performance performance) {
         return plays.get(performance.getPlayID());
     }
 
-    /**
-     * Computes the amount owed for the given performance in cents.
-     *
-     * @param performance the performance being evaluated
-     * @return amount owed (in cents)
-     * @throws RuntimeException if the play type is unknown
-     */
+    /** Computes the amount owed for a single performance. */
     private int getAmount(Performance performance) {
         final Play play = getPlay(performance);
         int result;
